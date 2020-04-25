@@ -40,13 +40,13 @@
      <enum>Qt::Horizontal</enum>
     </property>
    </widget>
-   <widget class="QWidget" name="widget" native="true">
+   <widget class="PlotWidget" name="graphWidget" native="true">
     <property name="geometry">
      <rect>
       <x>20</x>
       <y>10</y>
       <width>761</width>
-      <height>301</height>
+      <height>311</height>
      </rect>
     </property>
    </widget>
@@ -63,6 +63,14 @@
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>PlotWidget</class>
+   <extends>QWidget</extends>
+   <header>pyqtgraph</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>
