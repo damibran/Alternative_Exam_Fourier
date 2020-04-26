@@ -23,7 +23,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.signalGraph.setXRange(0, 8192, padding=0)
         self.signalGraph.setYRange(-20000, 20000, padding=0)
 
-        self.spectreGraph.setYRange(0, 18000000, padding=0)
+        self.spectreGraph.setYRange(0, 200, padding=0)
 
         signal=Signal("Test2.wav")
 
@@ -49,7 +49,12 @@ class MainWindow(QtWidgets.QMainWindow):
                 x.append(i*signal.sample_rate/4096)
             for i in range(1,4096):
                 x[i]=math.log10(x[i])
-            y=signal.getSpectre()[0][self.slider.value()][0:4096]
+            y=[]
+            for i in range(0,4096):
+                try:
+                    y.append(20*math.log10(signal.getSpectre()[0][self.slider.value()][i]))
+                except:
+                    y.append(0)
             self.spectreGraph.plot(x, y)
             self.cur_frame.setText(str(self.slider.value()))
 
