@@ -13,8 +13,8 @@ class Signal:
 		self.sample_num = self.wav.getnframes()#Количество сэмплов/кол-во каналов
 		self.duration = self.sample_num / self.sample_rate#Длина трека
 
-		print(self.duration)
-		print(self.sample_num)
+		#print(self.duration)
+		#print(self.sample_num)
 
 		self.types = {1: np.int8,2: np.int16,4: np.int32}#Называется словарь, нужен для ↓
 		self.content = self.wav.readframes(self.sample_num)#Считали все сэмплы в байтовую строку (байтовая строка: b'\x00\x00\x00\x00\...')
@@ -44,7 +44,7 @@ class Signal:
 			self.spectre.append([])
 			for j in range(len(self.frame[i])):
 				self.spectre[i].append([])
-				self.spectre[i][j]=self.FFT(self.frame[i][j])#Считаем спектры
+				self.spectre[i][j]=np.fft.fft(self.frame[i][j])#Считаем спектры
 
 		for i in range(self.channels_num):
 			for j in range(len(self.spectre[i])):
@@ -54,6 +54,35 @@ class Signal:
 				for k in range(1,len(self.spectre[i][j])//2):
 					self.spectre[i][j] = np.delete(self.spectre[i][j],k)
 				self.spectre[i][j] = np.delete(self.spectre[i][j], len(self.spectre[i][j])-1)
+
+	def FFT_vectorized(self,x):
+	    """A vectorized, non-recursive version of the Cooley-Tukey FFT"""
+	    x = np.asarray(x, dtype=float)
+	    N = x.shape[0]
+	
+	    if np.log2(N) % 1 > 0:
+	        raise ValueError("size of x must be a power of 2")
+		
+	    # N_min here is equivalent to the stopping condition above,
+	    # and should be a power of 2
+	    N_min = min(N, 32)
+	
+	    # Perform an O[N^2] DFT on all length-N_min sub-problems at once
+	    n = np.arange(N_min)
+	    k = n[:, None]
+	    M = np.exp(-2j * np.pi * n * k / N_min)
+	    X = np.dot(M, x.reshape((N_min, -1)))
+	
+	    # build-up each level of the recursive calculation all at once
+	    while X.shape[0] < N:
+	        X_even = X[:, :X.shape[1] // 2]
+	        X_odd = X[:, X.shape[1] // 2:]
+	        factor = np.exp(-1j * np.pi * np.arange(X.shape[0])
+	                        / X.shape[0])[:, None]
+	        X = np.vstack([X_even + factor * X_odd,
+	                       X_even - factor * X_odd])
+	
+	    return X.ravel()
 
 	def getSignal(self):
 		return self.frame

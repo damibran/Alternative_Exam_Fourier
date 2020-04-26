@@ -25,10 +25,10 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.spectreGraph.setYRange(0, 200, padding=0)
 
+        print("Computing...")
         signal=Signal("Test_Chords.wav")
-
-        print(signal.getDuration())
-
+        print("Done")
+        
         self.track_duration.setText(str(signal.getDuration()))
 
         self.slider.setMaximum(len(signal.getSignal()[0])-1)
