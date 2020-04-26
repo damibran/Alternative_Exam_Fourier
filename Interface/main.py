@@ -25,15 +25,15 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.spectreGraph.setYRange(0, 200, padding=0)
 
-        signal=Signal("Test2.wav")
+        signal=Signal("Test_Chords.wav")
 
         print(signal.getDuration())
 
         self.track_duration.setText(str(signal.getDuration()))
 
-        self.slider.setMaximum(len(signal.getSignal()[0]))
-
-        self.slider.sliderMoved.connect(self.position_changed(signal))
+        self.slider.setMaximum(len(signal.getSignal()[0])-1)
+        self.slider.setMinimum(0)
+        self.slider.valueChanged.connect(self.position_changed(signal))
 
     def position_changed(self,signal):
         def plot():
