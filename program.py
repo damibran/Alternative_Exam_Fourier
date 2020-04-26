@@ -73,3 +73,16 @@ for i in range(channels_num):
 for i in spectre[0][1]: #Так увидим вектор спектра первого кадра нулевого канала
 	print(i)
 '''
+
+for i in range(channels_num):
+	for j in range(len(spectre[i])):
+		for k in range(count_of_samples_per_frame):
+			spectre[i][j][k] = abs(spectre[i][j][k])
+		spectre[i][j] = np.frombuffer(spectre[i][j], dtype=np.float64)
+		for k in range(1,len(spectre[i][j])//2):
+			spectre[i][j] = np.delete(spectre[i][j],k)
+		spectre[i][j] = np.delete(spectre[i][j], len(spectre[i][j])-1)
+'''
+for i in spectre[0][1]: #Теперь в массиве спектров хранятся модули этих спектров
+	print(i)
+'''
