@@ -36,7 +36,7 @@ sample_num = wav.getnframes()#Количество сэмплов/кол-во к
 duration = sample_num / sample_rate#Длина трека
 
 print(duration)
-print(sample_rate)
+print(sample_num)
 
 types = {1: np.int8,2: np.int16,4: np.int32}#Называется словарь, нужен для ↓
 content = wav.readframes(sample_num)#Считали все сэмплы в байтовую строку (байтовая строка: b'\x00\x00\x00\x00\...')
@@ -61,7 +61,6 @@ for i in range(channels_num):
 '''
 for i in frame[0][1]: #Так мы можем посмотреть на первый кадр нулевого канала (есть еще нулевой кадр, я отсчет веду с нуля всегда)
 	print (i)
-
 '''
 
 spectre = []#Массив со спектрами похож на массив с кадрами, только вместо сымплов будут комплексные числа (спектры)
