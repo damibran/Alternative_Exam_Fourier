@@ -44,7 +44,7 @@ class Signal:
 			self.spectre.append([])
 			for j in range(len(self.frame[i])):
 				self.spectre[i].append([])
-				self.spectre[i][j]=np.fft.fft(self.frame[i][j])#Считаем спектры
+				self.spectre[i][j]=self.FFT(self.frame[i][j])#Считаем спектры
 
 		for i in range(self.channels_num):
 			for j in range(len(self.spectre[i])):
@@ -97,7 +97,7 @@ class Signal:
 		for i in range(len(self.frame)):
 			for j in range(len(self.frame[i])):
 				for k in range(len(self.frame[i][j])):
-					self.frame[i][j][k]=(0.54-0.46*math.cos((2*math.pi*k)/8128))*self.frame[i][j][k]
+					self.frame[i][j][k]=(0.54-0.46*math.cos((2*math.pi*k)/self.count_of_samples_per_frame))*self.frame[i][j][k]
 
 	def FFT(self,x):
 	    """A recursive implementation of the 1D Cooley-Tukey FFT"""
@@ -106,7 +106,7 @@ class Signal:
 	    N = int(N)
 	    if N % 2 > 0:
 	        raise ValueError("size of x must be a power of 2")
-	    elif N <= 32:  # this cutoff should be optimized
+	    elif N == 32:  # this cutoff should be optimized
 	        return self.DFT_slow(x)
 	    else:
 	        X_even = self.FFT(x[::2])

@@ -26,7 +26,7 @@ def DFT_slow(x):
     M = np.exp(-2j * np.pi * k * n / N)
     return np.dot(M, x)
 
-wav = wave.open("4.wav", mode="r")#Открываем файл, можно менять
+wav = wave.open("Test4.wav", mode="r")#Открываем файл, можно менять
 count_of_samples_per_frame = 8192#Разрешение ДПФ, можно менять
 
 channels_num = wav.getnchannels()#Количество каналов

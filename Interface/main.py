@@ -26,7 +26,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.spectreGraph.setYRange(0, 200, padding=0)
 
         print("Computing...")
-        signal=Signal("Test_Chords.wav")
+        signal=Signal("Full_Range.wav")
         print("Done")
         
         self.track_duration.setText(str(signal.getDuration()))
@@ -46,7 +46,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.spectreGraph.clear()
             x=[]
             for i in range(0,4096):
-                x.append(i*signal.sample_rate/4096)
+                x.append(i*signal.sample_rate/8192)
             for i in range(1,4096):
                 x[i]=math.log10(x[i])
             y=[]
