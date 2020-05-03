@@ -7,7 +7,7 @@ import wave
 import numpy as np
 import math
 from program import Signal
-
+import time
 class MainWindow(QtWidgets.QMainWindow):
 
     def __init__(self, *args, **kwargs):
@@ -25,9 +25,13 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.spectreGraph.setYRange(0, 200, padding=0)
 
+        start_time = time.time()
+
         print("Computing...")
-        signal=Signal("Full_Range.wav")
-        print("Done")
+        signal=Signal("Test6.wav")
+        print("Done in %s seconds"%(time.time() - start_time))
+ 
+
         
         self.track_duration.setText(str(signal.getDuration()))
 
