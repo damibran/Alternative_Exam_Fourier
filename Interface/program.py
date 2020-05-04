@@ -102,13 +102,15 @@ class Signal:
 		N=x.shape[0]
 		N=int(N)
 	
-		if N==2:
-			return np.concatenate([[x[0]+x[1]],[x[0]-x[1]]])
+		if N<=32:
+			return self.DFT_slow(x)
+			"""return np.concatenate([[x[0]+x[1]],[x[0]-x[1]]])"""
 		else:
 			X_even= self.myFFT(x[:N:2])
 			X_odd= self.myFFT(x[1:N:2])
 			factor = np.exp(-2j * np.pi * np.arange(N/2) / N)
-			return np.concatenate([X_even+factor*X_odd,X_even-factor*X_odd])
+			t=factor*X_odd
+			return np.concatenate([X_even+t,X_even-t])
 
 	def FFT(self,x):
 	    """A recursive implementation of the 1D Cooley-Tukey FFT"""

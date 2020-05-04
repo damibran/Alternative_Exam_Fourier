@@ -28,7 +28,7 @@ class MainWindow(QtWidgets.QMainWindow):
         start_time = time.time()
 
         print("Computing...")
-        signal=Signal("Test6.wav")
+        signal=Signal("Full_Range.wav")
         print("Done in %s seconds"%(time.time() - start_time))
  
 
