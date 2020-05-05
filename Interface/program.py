@@ -37,6 +37,24 @@ class Signal:
 					except:#Это происходит на последнем кадре. Так как для него больше нет сэмплов, забиваем все нулями
 						self.frame[i][j].append(0)
 
+		self.energy=[]
+		for i in range(len(self.frame)):
+			self.energy.append([])
+			for j in range(len(self.frame[i])):
+				sum=0
+				for k in range(len(self.frame[i][j])):
+					sum+= abs(self.frame[i][j][k])^2
+				self.energy[i].append(sum)
+		
+
+		for i in range(len(self.energy)):
+			minE=min(self.energy[i])
+			for j in range(len(self.energy[i])):
+				if self.energy[i][j]>minE:
+					self.energy[i][j]=1
+				else:
+					self.energy[i][j]=0
+
 		self.make_window()
 
 		self.spectre = []#Массив со спектрами похож на массив с кадрами, только вместо сымплов будут комплексные числа

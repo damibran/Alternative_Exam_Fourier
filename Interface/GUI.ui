@@ -50,7 +50,7 @@
      <string>Curent frame</string>
     </property>
    </widget>
-   <widget class="QLabel" name="track_duration">
+   <widget class="QLabel" name="silence">
     <property name="geometry">
      <rect>
       <x>390</x>
@@ -60,7 +60,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>Track duration</string>
+     <string>Check silence</string>
     </property>
    </widget>
    <widget class="PlotWidget" name="spectreGraph" native="true">
@@ -80,7 +80,7 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>21</height>
+     <height>22</height>
     </rect>
    </property>
   </widget>

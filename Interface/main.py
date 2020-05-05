@@ -30,10 +30,6 @@ class MainWindow(QtWidgets.QMainWindow):
         print("Computing...")
         signal=Signal("Full_Range.wav")
         print("Done in %s seconds"%(time.time() - start_time))
- 
-
-        
-        self.track_duration.setText(str(signal.getDuration()))
 
         self.slider.setMaximum(len(signal.getSignal()[0])-1)
         self.slider.setMinimum(0)
@@ -61,6 +57,10 @@ class MainWindow(QtWidgets.QMainWindow):
                     y.append(0)
             self.spectreGraph.plot(x, y)
             self.cur_frame.setText(str(self.slider.value()))
+            if signal.energy[0][self.slider.value()] == 1:
+                self.silence.setText(str('Music'))
+            else:
+                self.silence.setText(str('Silence'))
 
         return plot
 
