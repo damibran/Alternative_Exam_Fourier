@@ -21,7 +21,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         start_time = time.time()
         print("Computing...")
-        signal = Signal("Full_Range.wav")
+        signal = Signal("C4_Square_with_pauses.wav")
         print("Done in %s seconds" % (time.time() - start_time))
 
         self.signalGraph.setXRange(0, signal.count_of_samples_per_frame, padding=0)
@@ -46,8 +46,6 @@ class MainWindow(QtWidgets.QMainWindow):
             x = []
             for i in range(0, 188):  # signal.count_of_samples_per_frame // 2
                 x.append(i * signal.sample_rate / signal.count_of_samples_per_frame)
-
-            print(signal.maximum_freq_on_frame[0][self.slider.value()])
 
             freq = x[signal.maximum_freq_on_frame[0][self.slider.value()]]
             self.max_on_frame.setText(str(getNote(freq)))
