@@ -24,7 +24,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         start_time = time.time()
         print("Computing...")
-        signal = Signal("Music_with_pauses.wav")
+        signal = Signal("C4_Music_with_pauses.wav")
         print("Done in %s seconds" % (time.time() - start_time))
 
         self.signalGraph.setXRange(0, signal.count_of_samples_per_frame, padding=0)
@@ -45,26 +45,56 @@ class MainWindow(QtWidgets.QMainWindow):
             self.signalGraph.plot(x, y)
 
             self.spectreGraph.clear()
+
             x = []
-            for i in range(0, signal.count_of_samples_per_frame // 2):
+            for i in range(0, 187): #signal.count_of_samples_per_frame // 2
                 x.append(i * signal.sample_rate / signal.count_of_samples_per_frame)
-            for i in range(1, signal.count_of_samples_per_frame // 2):
+
+            s1 = [32.7, 34.65, 36.71, 38.89, 41.2, 43.65, 46.25, 49, 51.91, 55, 58.27, 61.74]
+            s2 = ["C","Cd","D","Dd","E","F","Fd","G","Gd","A","Ad","B"]
+            notes = {}
+            for i in range(1,8):
+                if i:
+                    for j in range(0,12):
+                        notes[s1[j]]= str(i)+s2[j]
+                        s1[j]=s1[j]*2
+
+            self.max_on_frame.setText(str(notes[asd(x[signal.maximum_freq_on_frame[0][self.slider.value()]],notes)]))
+
+            for i in range(1, 187):
                 x[i] = math.log10(x[i])
+
             y = []
-            for i in range(0, signal.count_of_samples_per_frame // 2):
+            for i in range(0, 187):
                 try:
                     y.append(20 * math.log10(signal.getSpectre()[0][self.slider.value()][i]))
                 except:
                     y.append(0)
 
+            
+            
             self.spectreGraph.plot(x, y)
             self.cur_frame.setText(str(self.slider.value()))
-            if signal.energy[0][self.slider.value()] == 1:
-                self.silence.setText(str('Music'))
-            else:
-                self.silence.setText(str('Silence'))
 
         return plot
+
+
+def asd(x,a):
+    b=[]
+    for i in a:
+        b.append(i)
+    l=0
+    r=len(b)-1
+    while r-l>1:
+        i=l+(r-l)//2
+        if b[i]>x:
+            r=i
+        else:
+            l=i
+    if x-b[l] < b[r]-x:
+        return(b[l])
+    return(b[r])
+
 
 
 def main():

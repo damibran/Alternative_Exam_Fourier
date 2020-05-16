@@ -88,6 +88,23 @@ class Signal:
                     self.spectre[i][j] = np.delete(self.spectre[i][j], k)
                 self.spectre[i][j] = np.delete(self.spectre[i][j], len(self.spectre[i][j]) - 1)
 
+        self.maximum_freq_on_frame=[]
+        # Ищем максимумы
+        for i in range(len(self.spectre)):
+            self.maximum_freq_on_frame.append([])
+            for j in range(len(self.spectre[i])):
+                maxim = 0
+                index = 0 
+                for k in range(len(self.spectre[i][j]) // 2):
+                    if self.spectre[i][j][k] > maxim:
+                        maxim = self.spectre[i][j][k]
+                        index = k
+                self.maximum_freq_on_frame[i].append(index)
+                """maximum=max(self.spectre[i][j])
+                print("M"+str(maximum))
+                print(np.where(self.spectre[i][j] == maximum))
+                self.maximum_freq_on_frame[i].append(np.where(self.spectre[i][j] == maximum))"""
+
     def getSignal(self):
         return self.frame
 
