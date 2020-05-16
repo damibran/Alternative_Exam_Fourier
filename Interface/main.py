@@ -21,7 +21,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         start_time = time.time()
         print("Computing...")
-        signal = Signal("C4_Music_with_pauses.wav")
+        signal = Signal("Full_Range.wav")
         print("Done in %s seconds" % (time.time() - start_time))
 
         self.signalGraph.setXRange(0, signal.count_of_samples_per_frame, padding=0)
@@ -44,17 +44,19 @@ class MainWindow(QtWidgets.QMainWindow):
             self.spectreGraph.clear()
 
             x = []
-            for i in range(0, 187):  # signal.count_of_samples_per_frame // 2
+            for i in range(0, 188):  # signal.count_of_samples_per_frame // 2
                 x.append(i * signal.sample_rate / signal.count_of_samples_per_frame)
+
+            print(signal.maximum_freq_on_frame[0][self.slider.value()])
 
             freq = x[signal.maximum_freq_on_frame[0][self.slider.value()]]
             self.max_on_frame.setText(str(getNote(freq)))
 
-            for i in range(1, 187):
+            for i in range(1, 188):
                 x[i] = math.log10(x[i])
 
             y = []
-            for i in range(0, 187):
+            for i in range(0, 188):
                 try:
                     y.append(20 * math.log10(signal.getSpectre()[0][self.slider.value()][i]))
                 except:

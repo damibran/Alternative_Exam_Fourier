@@ -117,7 +117,7 @@ class Signal:
             for j in range(len(self.spectre[i])):
                 maxim = 0
                 index = 0
-                for k in range(len(self.spectre[i][j]) // 2):
+                for k in range(188):
                     if self.spectre[i][j][k] > maxim:
                         maxim = self.spectre[i][j][k]
                         index = k
