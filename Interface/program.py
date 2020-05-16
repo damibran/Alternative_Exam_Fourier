@@ -1,6 +1,7 @@
-import wave
-import numpy as np
 import math
+import wave
+
+import numpy as np
 
 
 class Signal:
@@ -29,7 +30,33 @@ class Signal:
             for j in range(len(self.samples) // self.channels_num):
                 self.channel[i].append(self.samples[j * self.channels_num])
 
+        # Разбиваем на фреймы
         self.frame = []
+        self.getFrames()
+
+        # Считаем энергии кадров
+        self.energy = []
+        self.getEnery()
+
+        # Считаем среднюю энергию всего трека
+        average_energy = self.getAverageEnergy()
+
+        # Удаляем пустые кадры
+        self.deleteEmptyFrames(average_energy)
+
+        # Провешиваем окно на фреймы
+        self.make_window()
+
+        # Считаем спектры кадров
+        # Массив со спектрами похож на массив с кадрами, только вместо сымплов будут комплексные числа
+        self.spectre = []
+        self.makeSpectres()
+
+        # Ищем максимумы
+        self.maximum_freq_on_frame = []
+        self.findMax()
+
+    def getFrames(self):
         for i in range(self.channels_num):
             self.frame.append([])  # Для каждого канала создаем подмассив кадров
             for j in range(math.ceil(len(self.channel[i]) / self.count_of_samples_per_frame)):
@@ -41,8 +68,7 @@ class Signal:
                     except:  # Это происходит на последнем кадре. Так как для него больше нет сэмплов, забиваем все нулями
                         self.frame[i][j].append(0)
 
-        # Считаем энергии кадров
-        self.energy = []
+    def getEnery(self):
         for i in range(len(self.frame)):
             self.energy.append([])
             for j in range(len(self.frame[i])):
@@ -51,15 +77,15 @@ class Signal:
                     sum += abs(self.frame[i][j][k]) ^ 2
                 self.energy[i].append(sum)
 
-        # Считаем среднюю энергию всего трека
+    def getAverageEnergy(self):
         average_energy = 0
         for i in range(len(self.energy)):
             for j in range(len(self.energy[i])):
                 average_energy += int(self.energy[i][j])
         average_energy = average_energy / (len(self.energy[0]) * len(self.energy))
+        return average_energy
 
-        # Удаляем пустые кадры
-        # print(len(self.frame[0]))
+    def deleteEmptyFrames(self, average_energy):
         for i in range(len(self.energy)):
             j = 0
             while j < len(self.energy[i]):
@@ -68,11 +94,8 @@ class Signal:
                     self.energy = np.delete(self.energy, j, 1)
                     j -= 1
                 j += 1
-        # print(len(self.frame[0]))
 
-        self.make_window()
-
-        self.spectre = []  # Массив со спектрами похож на массив с кадрами, только вместо сымплов будут комплексные числа
+    def makeSpectres(self):
         for i in range(self.channels_num):
             self.spectre.append([])
             for j in range(len(self.frame[i])):
@@ -88,22 +111,17 @@ class Signal:
                     self.spectre[i][j] = np.delete(self.spectre[i][j], k)
                 self.spectre[i][j] = np.delete(self.spectre[i][j], len(self.spectre[i][j]) - 1)
 
-        self.maximum_freq_on_frame=[]
-        # Ищем максимумы
+    def findMax(self):
         for i in range(len(self.spectre)):
             self.maximum_freq_on_frame.append([])
             for j in range(len(self.spectre[i])):
                 maxim = 0
-                index = 0 
+                index = 0
                 for k in range(len(self.spectre[i][j]) // 2):
                     if self.spectre[i][j][k] > maxim:
                         maxim = self.spectre[i][j][k]
                         index = k
                 self.maximum_freq_on_frame[i].append(index)
-                """maximum=max(self.spectre[i][j])
-                print("M"+str(maximum))
-                print(np.where(self.spectre[i][j] == maximum))
-                self.maximum_freq_on_frame[i].append(np.where(self.spectre[i][j] == maximum))"""
 
     def getSignal(self):
         return self.frame

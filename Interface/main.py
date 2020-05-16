@@ -1,13 +1,10 @@
-from PyQt5 import QtWidgets, QtCore, uic
-from pyqtgraph import PlotWidget, plot
-import pyqtgraph as pg
-import sys  # We need sys so that we can pass argv to QApplication
-import os
-import wave
-import numpy as np
 import math
-from program import Signal
+import sys  # We need sys so that we can pass argv to QApplication
 import time
+
+from PyQt5 import QtWidgets, QtCore, uic
+
+from program import Signal
 
 
 class MainWindow(QtWidgets.QMainWindow):
@@ -47,19 +44,11 @@ class MainWindow(QtWidgets.QMainWindow):
             self.spectreGraph.clear()
 
             x = []
-            for i in range(0, 187): #signal.count_of_samples_per_frame // 2
+            for i in range(0, 187):  # signal.count_of_samples_per_frame // 2
                 x.append(i * signal.sample_rate / signal.count_of_samples_per_frame)
 
-            s1 = [32.7, 34.65, 36.71, 38.89, 41.2, 43.65, 46.25, 49, 51.91, 55, 58.27, 61.74]
-            s2 = ["C","Cd","D","Dd","E","F","Fd","G","Gd","A","Ad","B"]
-            notes = {}
-            for i in range(1,8):
-                if i:
-                    for j in range(0,12):
-                        notes[s1[j]]= str(i)+s2[j]
-                        s1[j]=s1[j]*2
-
-            self.max_on_frame.setText(str(notes[asd(x[signal.maximum_freq_on_frame[0][self.slider.value()]],notes)]))
+            freq = x[signal.maximum_freq_on_frame[0][self.slider.value()]]
+            self.max_on_frame.setText(str(getNote(freq)))
 
             for i in range(1, 187):
                 x[i] = math.log10(x[i])
@@ -71,30 +60,39 @@ class MainWindow(QtWidgets.QMainWindow):
                 except:
                     y.append(0)
 
-            
-            
             self.spectreGraph.plot(x, y)
             self.cur_frame.setText(str(self.slider.value()))
 
         return plot
 
 
-def asd(x,a):
-    b=[]
+def getNote(freq):
+    s1 = [32.7, 34.65, 36.71, 38.89, 41.2, 43.65, 46.25, 49, 51.91, 55, 58.27, 61.74]
+    s2 = ["C", "Cd", "D", "Dd", "E", "F", "Fd", "G", "Gd", "A", "Ad", "B"]
+    notes = {}
+    for i in range(1, 8):
+        if i:
+            for j in range(0, 12):
+                notes[s1[j]] = str(i) + s2[j]
+                s1[j] = s1[j] * 2
+    return notes[asd(freq, notes)]
+
+
+def asd(x, a):
+    b = []
     for i in a:
         b.append(i)
-    l=0
-    r=len(b)-1
-    while r-l>1:
-        i=l+(r-l)//2
-        if b[i]>x:
-            r=i
+    l = 0
+    r = len(b) - 1
+    while r - l > 1:
+        i = l + (r - l) // 2
+        if b[i] > x:
+            r = i
         else:
-            l=i
-    if x-b[l] < b[r]-x:
-        return(b[l])
-    return(b[r])
-
+            l = i
+    if x - b[l] < b[r] - x:
+        return (b[l])
+    return (b[r])
 
 
 def main():
