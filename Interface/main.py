@@ -21,7 +21,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         start_time = time.time()
         print("Computing...")
-        signal = Signal("C4_Square_with_pauses.wav")
+        signal = Signal("Test.wav")
         print("Done in %s seconds" % (time.time() - start_time))
 
         self.signalGraph.setXRange(0, signal.count_of_samples_per_frame, padding=0)
@@ -44,17 +44,28 @@ class MainWindow(QtWidgets.QMainWindow):
             self.spectreGraph.clear()
 
             x = []
-            for i in range(0, 188):  # signal.count_of_samples_per_frame // 2
+            for i in range(0, 734):  # signal.count_of_samples_per_frame // 2
                 x.append(i * signal.sample_rate / signal.count_of_samples_per_frame)
 
-            freq = x[signal.maximum_freq_on_frame[0][self.slider.value()]]
-            self.max_on_frame.setText(str(getNote(freq)))
+            s1 = [32.7, 34.65, 36.71, 38.89, 41.2, 43.65, 46.25, 49, 51.91, 55, 58.27, 61.74]
+            s2 = ["C", "Cd", "D", "Dd", "E", "F", "Fd", "G", "Gd", "A", "Ad", "B"]
+            notes = {}
+            for i in range(1, 8):
+                if i:
+                    for j in range(0, 12):
+                        notes[s1[j]] = str(i) + s2[j]
+                        s1[j] = s1[j] * 2
 
-            for i in range(1, 188):
+            # freq = x[signal.maximum_freq_on_frame[0][self.slider.value()]]
+            keys = list(notes.keys())
+            freq = notes[keys[signal.maximum_freq_on_frame[0][self.slider.value()]]]
+            self.max_on_frame.setText(str(freq))
+
+            for i in range(1, 734):
                 x[i] = math.log10(x[i])
 
             y = []
-            for i in range(0, 188):
+            for i in range(0, 734):
                 try:
                     y.append(20 * math.log10(signal.getSpectre()[0][self.slider.value()][i]))
                 except:
@@ -75,6 +86,7 @@ def getNote(freq):
             for j in range(0, 12):
                 notes[s1[j]] = str(i) + s2[j]
                 s1[j] = s1[j] * 2
+
     return notes[asd(freq, notes)]
 
 

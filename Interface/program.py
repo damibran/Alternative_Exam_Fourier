@@ -7,7 +7,7 @@ import numpy as np
 class Signal:
     def __init__(self, file):
         self.wav = wave.open(file, mode="r")  # Открываем файл, можно менять
-        self.count_of_samples_per_frame = 2048  # Разрешение ДПФ, можно менять
+        self.count_of_samples_per_frame = 8192  # Разрешение ДПФ, можно менять
 
         self.channels_num = self.wav.getnchannels()  # Количество каналов
         self.sample_width = self.wav.getsampwidth()  # Байт/сэмпл
@@ -44,17 +44,68 @@ class Signal:
         # Удаляем пустые кадры
         self.deleteEmptyFrames(average_energy)
 
-        # Провешиваем окно на фреймы
-        self.make_window()
+        # Провешиваем окно на кадры
+        for i in range(len(self.frame)):
+            for j in range(len(self.frame[i])):
+                self.make_window(self.frame[i][j])
 
         # Считаем спектры кадров
         # Массив со спектрами похож на массив с кадрами, только вместо сымплов будут комплексные числа
         self.spectre = []
         self.makeSpectres()
 
-        # Ищем максимумы
+        s1 = [32.7, 34.65, 36.71, 38.89, 41.2, 43.65, 46.25, 49, 51.91, 55, 58.27, 61.74]
+        s2 = ["C", "Cd", "D", "Dd", "E", "F", "Fd", "G", "Gd", "A", "Ad", "B"]
+        notes = {}
+        for i in range(1, 8):
+            if i:
+                for j in range(0, 12):
+                    notes[s1[j]] = str(i) + s2[j]
+                    s1[j] = s1[j] * 2
+
+        reference_freq = list(notes.keys())
+        spectre_freq = []
+
+        for i in range(8129):
+            spectre_freq.append(i * self.sample_rate / self.count_of_samples_per_frame)
+
+        ranges = [0]
+        for i in range(len(reference_freq) - 1):
+            ranges.append(asd((reference_freq[i] + reference_freq[i + 1]) / 2, spectre_freq))
+
+        print("Ranges " + str(len((ranges))) + " Refer " + str(len(reference_freq)))
+
+        average_on_range = []
+        for i in range(len(self.spectre)):
+            average_on_range.append([])
+            for j in range(len(self.spectre[i])):
+                average_on_range[i].append([])
+                for k in range(len(ranges) - 1):
+                    left = ranges[k]
+                    right = ranges[k + 1]
+                    freq_range = list(self.spectre[i][j][left:right + 1])
+                    self.make_window(freq_range)
+                    if len(freq_range) > 1:
+                        avereage_arifm = 0
+                        for l in range(len(freq_range)):
+                            avereage_arifm += freq_range[l]
+                        avereage_arifm /= len(freq_range)
+                    else:
+                        avereage_arifm = freq_range[0]
+                    average_on_range[i][j].append(avereage_arifm)
+
         self.maximum_freq_on_frame = []
-        self.findMax()
+        for i in range(len(average_on_range)):
+            self.maximum_freq_on_frame.append([])
+            for j in range(len(average_on_range[i])):
+                maxim = 0
+                index = 0
+                for k in range(len(average_on_range[i][j])):
+                    if (average_on_range[i][j][k] > maxim):
+                        maxim = average_on_range[i][j][k]
+                        index = k
+                self.maximum_freq_on_frame[i].append(index)
+
 
     def getFrames(self):
         for i in range(self.channels_num):
@@ -132,12 +183,10 @@ class Signal:
     def getDuration(self):
         return self.duration
 
-    def make_window(self):
-        for i in range(len(self.frame)):
-            for j in range(len(self.frame[i])):
-                for k in range(len(self.frame[i][j])):
-                    self.frame[i][j][k] = (0.54 - 0.46 * math.cos(
-                        (2 * math.pi * k) / self.count_of_samples_per_frame)) * self.frame[i][j][k]
+    def make_window(self, arr):
+        for k in range(len(arr)):
+            arr[k] = (0.54 - 0.46 * math.cos(
+                (2 * math.pi * k) / len(arr))) * arr[k]
 
     def myFFT(self, x):
         x = np.asarray(x, dtype=float)
@@ -205,3 +254,20 @@ class Signal:
             factor = np.exp(-2j * np.pi * np.arange(N) / N)
             return np.concatenate([X_even + factor[:N // 2] * X_odd,
                                    X_even + factor[N // 2:] * X_odd])
+
+
+def asd(x, a):
+    b = []
+    for i in a:
+        b.append(i)
+    l = 0
+    r = len(b) - 1
+    while r - l > 1:
+        i = l + (r - l) // 2
+        if b[i] > x:
+            r = i
+        else:
+            l = i
+    if x - b[l] < b[r] - x:
+        return (l)
+    return (r)
