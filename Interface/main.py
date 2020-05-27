@@ -4,6 +4,8 @@ import time
 
 from PyQt5 import QtWidgets, QtCore, uic
 
+import pyqtgraph
+
 from program import Signal
 
 
@@ -21,7 +23,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         start_time = time.time()
         print("Computing...")
-        signal = Signal("Test.wav")
+        signal = Signal("Music.wav")
         print("Done in %s seconds" % (time.time() - start_time))
 
         self.signalGraph.setXRange(0, signal.count_of_samples_per_frame, padding=0)
