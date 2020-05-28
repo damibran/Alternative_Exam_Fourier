@@ -1,6 +1,0 @@
-0)Install pyinstaller(via PowerShell\Console):
-pip install pyinstaller
-1)Run in PowerShall\Console when in root folder(Interface) : 
-pyinstaller --add-data="GUI.ui;." --add-data="program.py;." main.py
-2)Throw Music.wav in dist/main
-Name must be Music.wav!!
