@@ -58,7 +58,6 @@ class MainWindow(QtWidgets.QMainWindow):
                         notes[s1[j]] = str(i) + s2[j]
                         s1[j] = s1[j] * 2
 
-            # freq = x[signal.maximum_freq_on_frame[0][self.slider.value()]]
             keys = list(notes.keys())
             freq = notes[keys[signal.maximum_freq_on_frame[0][self.slider.value()]]]
             self.max_on_frame.setText(str(freq))

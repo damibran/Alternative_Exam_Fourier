@@ -50,7 +50,7 @@ class Signal:
                 self.make_window(self.frame[i][j])
 
         # Считаем спектры кадров
-        # Массив со спектрами похож на массив с кадрами, только вместо сымплов будут комплексные числа
+        # Массив со спектральными отсчётами похож на массив с кадрами, только вместо семплов будут комплексные числа
         self.spectre = []
         self.makeSpectres()
 
@@ -104,6 +104,29 @@ class Signal:
                         maxim = average_on_range[i][j][k]
                         index = k
                 self.maximum_freq_on_frame[i].append(index)
+
+        counts_of_repetition=[]
+        for i in range(1):
+            for j in range(len(self.maximum_freq_on_frame[i])):
+                k=search_for_repetition(counts_of_repetition,notes[reference_freq[self.maximum_freq_on_frame[i][j]]])
+                if  k == -1:
+                    counts_of_repetition.append([notes[reference_freq[self.maximum_freq_on_frame[i][j]]],0]) 
+                else:
+                    counts_of_repetition[k][1]+=1
+
+        k=0
+        self.most_frequently_encounted=[]
+        while(k<3):
+            max=0
+            index=0
+            for i in range(len(counts_of_repetition)):
+                if counts_of_repetition[i][1]>=max:
+                    max=counts_of_repetition[i][1]
+                    index=i
+            self.most_frequently_encounted.append(counts_of_repetition[index])
+            del counts_of_repetition[index]
+            k+=1
+        print(self.most_frequently_encounted)
 
 
     def getFrames(self):
@@ -270,3 +293,13 @@ def asd(x, a):
     if x - b[l] < b[r] - x:
         return (l)
     return (r)
+
+def search_for_repetition(a,x):
+    flag=False
+    for i in range(len(a)):
+        if a[i][0] == x:
+            flag=True
+            return i
+    if flag == False:
+        return -1
+        
