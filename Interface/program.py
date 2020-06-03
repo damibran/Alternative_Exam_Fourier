@@ -30,6 +30,8 @@ class Signal:
             for j in range(len(self.samples) // self.channels_num):
                 self.channel[i].append(self.samples[j * self.channels_num])
 
+        self.channels_num=1
+
         # Разбиваем на фреймы
         self.frame = []
         self.getFrames()
@@ -68,6 +70,7 @@ class Signal:
 
         for i in range(8129):
             spectre_freq.append(i * self.sample_rate / self.count_of_samples_per_frame)
+        print(spectre_freq)
 
         ranges = [0]
         for i in range(len(reference_freq) - 1):
