@@ -4,7 +4,7 @@ block_cipher = None
 
 
 a = Analysis(['main.py'],
-             pathex=['C:\\Users\\olege\\Desktop\\Interface'],
+             pathex=['C:\\Users\\olege\\Desktop\\Alternative_Exam_Fourier\\Interface'],
              binaries=[],
              datas=[('GUI.ui', '.'), ('program.py', '.')],
              hiddenimports=[],

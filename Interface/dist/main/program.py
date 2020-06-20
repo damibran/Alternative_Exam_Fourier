@@ -7,7 +7,7 @@ import numpy as np
 class Signal:
     def __init__(self, file):
         self.wav = wave.open(file, mode="r")  # Открываем файл, можно менять
-        self.count_of_samples_per_frame = 8192  # Разрешение ДПФ, можно менять
+        self.count_of_samples_per_frame = 16384  # Разрешение ДПФ, можно менять
 
         self.channels_num = self.wav.getnchannels()  # Количество каналов
         self.sample_width = self.wav.getsampwidth()  # Байт/сэмпл
@@ -18,7 +18,8 @@ class Signal:
         # print(self.duration)
         # print(self.sample_num)
 
-        self.types = {1: np.int8, 2: np.int16, 4: np.int32}  # Называется словарь, нужен для ↓
+        # Называется словарь, нужен для ↓
+        self.types = {1: np.int8, 2: np.int16, 4: np.int32}
         self.content = self.wav.readframes(
             self.sample_num)  # Считали все сэмплы в байтовую строку (байтовая строка: b'\x00\x00\x00\x00\...')
         self.samples = np.frombuffer(self.content, dtype=self.types[
@@ -29,6 +30,8 @@ class Signal:
             self.channel.append([])
             for j in range(len(self.samples) // self.channels_num):
                 self.channel[i].append(self.samples[j * self.channels_num])
+
+        self.channels_num = 1
 
         # Разбиваем на фреймы
         self.frame = []
@@ -50,11 +53,12 @@ class Signal:
                 self.make_window(self.frame[i][j])
 
         # Считаем спектры кадров
-        # Массив со спектрами похож на массив с кадрами, только вместо сымплов будут комплексные числа
+        # Массив со спектральными отсчётами похож на массив с кадрами, только вместо семплов будут комплексные числа
         self.spectre = []
         self.makeSpectres()
 
-        s1 = [32.7, 34.65, 36.71, 38.89, 41.2, 43.65, 46.25, 49, 51.91, 55, 58.27, 61.74]
+        s1 = [32.7, 34.65, 36.71, 38.89, 41.2, 43.65,
+              46.25, 49, 51.91, 55, 58.27, 61.74]
         s2 = ["C", "Cd", "D", "Dd", "E", "F", "Fd", "G", "Gd", "A", "Ad", "B"]
         notes = {}
         for i in range(1, 8):
@@ -67,12 +71,13 @@ class Signal:
         spectre_freq = []
 
         for i in range(8129):
-            spectre_freq.append(i * self.sample_rate / self.count_of_samples_per_frame)
+            spectre_freq.append(i * self.sample_rate /
+                                self.count_of_samples_per_frame)
 
         ranges = [0]
         for i in range(len(reference_freq) - 1):
-            ranges.append(asd((reference_freq[i] + reference_freq[i + 1]) / 2, spectre_freq))
-
+            ranges.append(
+                asd((reference_freq[i] + reference_freq[i + 1]) / 2, spectre_freq))
 
         average_on_range = []
         for i in range(len(self.spectre)):
@@ -105,12 +110,38 @@ class Signal:
                         index = k
                 self.maximum_freq_on_frame[i].append(index)
 
+        counts_of_repetition = []
+        for i in range(1):
+            for j in range(len(self.maximum_freq_on_frame[i])):
+                k = search_for_repetition(
+                    counts_of_repetition, notes[reference_freq[self.maximum_freq_on_frame[i][j]]])
+                if k == -1:
+                    counts_of_repetition.append(
+                        [notes[reference_freq[self.maximum_freq_on_frame[i][j]]], 1])
+                else:
+                    counts_of_repetition[k][1] += 1
+
+        k = 0
+        self.most_frequently_encounted = []
+        while(k < 3):
+            max = 0
+            index = 0
+            for i in range(len(counts_of_repetition)):
+                if counts_of_repetition[i][1] >= max:
+                    max = counts_of_repetition[i][1]
+                    index = i
+            self.most_frequently_encounted.append(counts_of_repetition[index])
+            del counts_of_repetition[index]
+            k += 1
+        print(self.most_frequently_encounted)
 
     def getFrames(self):
         for i in range(self.channels_num):
-            self.frame.append([])  # Для каждого канала создаем подмассив кадров
+            # Для каждого канала создаем подмассив кадров
+            self.frame.append([])
             for j in range(math.ceil(len(self.channel[i]) / self.count_of_samples_per_frame)):
-                self.frame[i].append([])  # Для каждого кадра создаем массив сэмплов
+                # Для каждого кадра создаем массив сэмплов
+                self.frame[i].append([])
                 for k in range(j * self.count_of_samples_per_frame,
                                self.count_of_samples_per_frame + j * self.count_of_samples_per_frame):
                     try:  # Заполняем массив сэмплов сэмплами
@@ -132,7 +163,8 @@ class Signal:
         for i in range(len(self.energy)):
             for j in range(len(self.energy[i])):
                 average_energy += int(self.energy[i][j])
-        average_energy = average_energy / (len(self.energy[0]) * len(self.energy))
+        average_energy = average_energy / \
+            (len(self.energy[0]) * len(self.energy))
         return average_energy
 
     def deleteEmptyFrames(self, average_energy):
@@ -150,16 +182,19 @@ class Signal:
             self.spectre.append([])
             for j in range(len(self.frame[i])):
                 self.spectre[i].append([])
-                self.spectre[i][j] = self.FFT_vectorized(self.frame[i][j])  # Считаем спектры
+                self.spectre[i][j] = self.FFT_vectorized(
+                    self.frame[i][j])  # Считаем спектры
 
         for i in range(self.channels_num):
             for j in range(len(self.spectre[i])):
                 for k in range(self.count_of_samples_per_frame):
                     self.spectre[i][j][k] = abs(self.spectre[i][j][k])
-                self.spectre[i][j] = np.frombuffer(self.spectre[i][j], dtype=np.float64)
+                self.spectre[i][j] = np.frombuffer(
+                    self.spectre[i][j], dtype=np.float64)
                 for k in range(1, len(self.spectre[i][j]) // 2):
                     self.spectre[i][j] = np.delete(self.spectre[i][j], k)
-                self.spectre[i][j] = np.delete(self.spectre[i][j], len(self.spectre[i][j]) - 1)
+                self.spectre[i][j] = np.delete(
+                    self.spectre[i][j], len(self.spectre[i][j]) - 1)
 
     def findMax(self):
         for i in range(len(self.spectre)):
@@ -270,3 +305,13 @@ def asd(x, a):
     if x - b[l] < b[r] - x:
         return (l)
     return (r)
+
+
+def search_for_repetition(a, x):
+    flag = False
+    for i in range(len(a)):
+        if a[i][0] == x:
+            flag = True
+            return i
+    if flag == False:
+        return -1

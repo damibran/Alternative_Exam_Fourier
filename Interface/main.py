@@ -26,7 +26,8 @@ class MainWindow(QtWidgets.QMainWindow):
         signal = Signal("Music.wav")
         print("Done in %s seconds" % (time.time() - start_time))
 
-        self.signalGraph.setXRange(0, signal.count_of_samples_per_frame, padding=0)
+        self.signalGraph.setXRange(
+            0, signal.count_of_samples_per_frame, padding=0)
         self.signalGraph.setYRange(-20000, 20000, padding=0)
 
         self.spectreGraph.setYRange(0, 200, padding=0)
@@ -34,6 +35,10 @@ class MainWindow(QtWidgets.QMainWindow):
         self.slider.setMaximum(len(signal.getSignal()[0]) - 1)
         self.slider.setMinimum(0)
         self.slider.valueChanged.connect(self.position_changed(signal))
+
+        self.most_freq_encounted.setText(signal.most_frequently_encounted[0][0]+":"+str(signal.most_frequently_encounted[0][1])+" ; " +
+                                         signal.most_frequently_encounted[1][0]+":"+str(signal.most_frequently_encounted[1][1])+" ; " +
+                                         signal.most_frequently_encounted[2][0]+":"+str(signal.most_frequently_encounted[2][1]))
 
     def position_changed(self, signal):
         def plot():
@@ -46,11 +51,14 @@ class MainWindow(QtWidgets.QMainWindow):
             self.spectreGraph.clear()
 
             x = []
-            for i in range(0, 734):  # signal.count_of_samples_per_frame // 2
-                x.append(i * signal.sample_rate / signal.count_of_samples_per_frame)
+            for i in range(12, 1470):  # signal.count_of_samples_per_frame // 2
+                x.append(i * signal.sample_rate /
+                         signal.count_of_samples_per_frame)
 
-            s1 = [32.7, 34.65, 36.71, 38.89, 41.2, 43.65, 46.25, 49, 51.91, 55, 58.27, 61.74]
-            s2 = ["C", "Cd", "D", "Dd", "E", "F", "Fd", "G", "Gd", "A", "Ad", "B"]
+            s1 = [32.7, 34.65, 36.71, 38.89, 41.2, 43.65,
+                  46.25, 49, 51.91, 55, 58.27, 61.74]
+            s2 = ["C", "Cd", "D", "Dd", "E", "F",
+                  "Fd", "G", "Gd", "A", "Ad", "B"]
             notes = {}
             for i in range(1, 8):
                 if i:
@@ -59,16 +67,18 @@ class MainWindow(QtWidgets.QMainWindow):
                         s1[j] = s1[j] * 2
 
             keys = list(notes.keys())
-            freq = notes[keys[signal.maximum_freq_on_frame[0][self.slider.value()]]]
+            freq = notes[keys[signal.maximum_freq_on_frame[0]
+                              [self.slider.value()]]]
             self.max_on_frame.setText(str(freq))
 
-            for i in range(1, 734):
+            for i in range(1458):
                 x[i] = math.log10(x[i])
 
             y = []
-            for i in range(0, 734):
+            for i in range(12, 1470):
                 try:
-                    y.append(20 * math.log10(signal.getSpectre()[0][self.slider.value()][i]))
+                    y.append(20 * math.log10(signal.getSpectre()
+                                             [0][self.slider.value()][i]))
                 except:
                     y.append(0)
 
@@ -79,7 +89,8 @@ class MainWindow(QtWidgets.QMainWindow):
 
 
 def getNote(freq):
-    s1 = [32.7, 34.65, 36.71, 38.89, 41.2, 43.65, 46.25, 49, 51.91, 55, 58.27, 61.74]
+    s1 = [32.7, 34.65, 36.71, 38.89, 41.2, 43.65,
+          46.25, 49, 51.91, 55, 58.27, 61.74]
     s2 = ["C", "Cd", "D", "Dd", "E", "F", "Fd", "G", "Gd", "A", "Ad", "B"]
     notes = {}
     for i in range(1, 8):
